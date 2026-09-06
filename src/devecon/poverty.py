@@ -5,6 +5,23 @@ from collections import namedtuple
 import numpy as np
 
 
+def _prepare_sample_weights(weights, n):
+    """Validate and return sample weights for n units.
+
+    Defaults to equal weights when None. Ensures a 1-D float array of
+    length n with no negative entries. Shared by all measures so the
+    weight-handling rules live in exactly one place.
+    """
+    if weights is None:
+        return np.ones(n, dtype=float)
+    w = np.asarray(weights, dtype=float)
+    if w.shape != (n,):
+        raise ValueError(f"sample weights must have shape ({n},).")
+    if np.any(w < 0):
+        raise ValueError("sample weights must be non-negative.")
+    return w
+
+
 def fgt(income, poverty_line, alpha=0.0, weights=None):
     """Foster-Greer-Thorbecke (FGT) poverty index.
 
@@ -28,15 +45,15 @@ def fgt(income, poverty_line, alpha=0.0, weights=None):
         The FGT index, in [0, 1].
     """
     income = np.asarray(income, dtype=float)
-    weights = (np.ones_like(income) if weights is None
-               else np.asarray(weights, dtype=float))
 
     if poverty_line <= 0:
         raise ValueError("poverty_line must be positive.")
     if alpha < 0:
         raise ValueError("alpha must be non-negative.")
-    if income.shape != weights.shape:
-        raise ValueError("income and weights must have the same shape.")
+
+    weights = _prepare_sample_weights(weights, income.shape[0])
+    if income.ndim != 1:
+        raise ValueError("income must be 1-D.")
 
     poor = income < poverty_line
     gaps = np.clip((poverty_line - income) / poverty_line, 0.0, None)
@@ -92,15 +109,8 @@ def alkire_foster(deprivations, cutoff_k, indicator_weights=None,
             raise ValueError("indicator_weights must be non-negative.")
     w = w / w.sum()
 
-    # Sample weights: equal by default.
-    if sample_weights is None:
-        s = np.ones(n, dtype=float)
-    else:
-        s = np.asarray(sample_weights, dtype=float)
-        if s.shape != (n,):
-            raise ValueError(f"sample_weights must have shape ({n},).")
-        if np.any(s < 0):
-            raise ValueError("sample_weights must be non-negative.")
+    # Sample weights: shared helper (rows).
+    s = _prepare_sample_weights(sample_weights, n)
 
     # Step 1: weighted deprivation score for each person (in [0, 1]).
     scores = dep @ w
