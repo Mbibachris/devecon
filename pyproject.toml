@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "devecon"
+version = "0.0.1"
+description = "Development-economics measures: poverty, inequality, and decomposition."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Christopher Mbiba", email = "mbibachris@gmail.com" }]
+dependencies = ["numpy>=1.20"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "pytest-cov"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/devecon"]
