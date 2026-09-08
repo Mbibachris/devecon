@@ -8,6 +8,7 @@ NaN = unknown) that alkire_foster then consumes.
 """
 
 from __future__ import annotations
+
 import numpy as np
 
 # Each allowed operator string maps to the comparison it performs.

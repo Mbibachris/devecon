@@ -8,6 +8,7 @@ alignment bug (right weights, wrong order) becomes impossible.
 """
 
 from __future__ import annotations
+
 import numpy as np
 
 from .deprivation import deprive, deprive_in

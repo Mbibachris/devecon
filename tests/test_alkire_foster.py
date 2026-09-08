@@ -2,7 +2,6 @@ import pytest
 
 from devecon import alkire_foster
 
-
 # Reused deprivation matrix (matches the worked example):
 #   person 0: deprived in all 3   -> score 1.00
 #   person 1: deprived in 2 of 3  -> score 0.67

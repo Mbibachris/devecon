@@ -1,4 +1,5 @@
 import pytest
+
 from devecon.poverty import fgt
 
 

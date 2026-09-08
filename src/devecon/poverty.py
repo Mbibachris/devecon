@@ -1,7 +1,9 @@
 """Poverty measures: unidimensional (FGT) and multidimensional (Alkire-Foster)."""
 
 from __future__ import annotations
+
 from collections import namedtuple
+
 import numpy as np
 
 

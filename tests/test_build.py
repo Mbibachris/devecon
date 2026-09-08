@@ -4,11 +4,10 @@ import pytest
 pd = pytest.importorskip("pandas")   # skip file cleanly if pandas absent
 
 from devecon import (
-    build_nested_weights,
-    build_deprivation_matrix,
     alkire_foster,
+    build_deprivation_matrix,
+    build_nested_weights,
 )
-
 
 # ---- build_nested_weights ------------------------------------------------
 
@@ -31,7 +30,7 @@ def test_unequal_indicator_counts_preserve_dimension_share():
         "education": {"weight": 1/3, "indicators": ["e", "f"]},
         "living":    {"weight": 1/3, "indicators": ["g", "h"]},
     }
-    names, w = build_nested_weights(structure)
+    _, w = build_nested_weights(structure)
     assert w[:4] == pytest.approx([1/12] * 4)   # health each
     assert w[4:] == pytest.approx([1/6] * 4)    # others each
     assert w[:4].sum() == pytest.approx(1/3)    # dimension share intact
@@ -98,7 +97,7 @@ def test_missing_raise_is_default():
 def test_missing_drop_removes_rows():
     df = pd.DataFrame({"x": [1.0, np.nan, 5.0]})
     spec = [{"name": "i", "column": "x", "op": "<", "cutoff": 3}]
-    names, matrix, kept = build_deprivation_matrix(df, spec, missing="drop")
+    _, matrix, kept = build_deprivation_matrix(df, spec, missing="drop")
     assert matrix.tolist() == [[1], [0]]               # middle row dropped
     assert kept.tolist() == [True, False, True]
 
@@ -106,7 +105,7 @@ def test_missing_drop_removes_rows():
 def test_missing_deprived_zero_fills():
     df = pd.DataFrame({"x": [1.0, np.nan, 5.0]})
     spec = [{"name": "i", "column": "x", "op": "<", "cutoff": 3}]
-    names, matrix, kept = build_deprivation_matrix(df, spec, missing="deprived=0")
+    _, matrix, kept = build_deprivation_matrix(df, spec, missing="deprived=0")
     assert matrix.tolist() == [[1], [0], [0]]          # NaN -> 0
     assert kept.all()
 
@@ -135,7 +134,7 @@ def test_end_to_end_alignment():
         {"name": "water",  "column": "water_src",
          "deprived_categories": {"surface"}},
     ]
-    mat_names, matrix, kept = build_deprivation_matrix(df, spec)
+    mat_names, matrix, _ = build_deprivation_matrix(df, spec)
 
     # The alignment guarantee: matrix columns and weights share an order.
     assert mat_names == names

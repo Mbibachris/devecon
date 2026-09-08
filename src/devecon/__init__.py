@@ -1,10 +1,14 @@
-from .poverty import fgt, alkire_foster, AFResult
+from .build import build_deprivation_matrix, build_nested_weights
 from .deprivation import deprive, deprive_in
-from .build import build_nested_weights, build_deprivation_matrix
+from .poverty import AFResult, alkire_foster, fgt
 
 __version__ = "0.0.1"
 __all__ = [
-    "fgt", "alkire_foster", "AFResult",
-    "deprive", "deprive_in",
-    "build_nested_weights", "build_deprivation_matrix",
+    "AFResult",
+    "alkire_foster",
+    "build_deprivation_matrix",
+    "build_nested_weights",
+    "deprive",
+    "deprive_in",
+    "fgt",
 ]
