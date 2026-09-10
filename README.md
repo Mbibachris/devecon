@@ -97,7 +97,24 @@ print(result)
 `H` is the share of people who are multidimensionally poor, `A` the average
 breadth of deprivation among the poor, and `M0 = H × A` the adjusted headcount
 ratio. That identity holds by construction — and is enforced as a test.
+## One engine, many indices
 
+The Alkire–Foster method isn't a *poverty* method — it's a general
+counting-based measure of joint deprivation across dimensions. Poverty is
+just its most familiar application. The same `devecon` functions compute
+any multidimensional index; only the dimensions, indicators, and cutoffs
+change:
+
+| Index | Dimensions | Deprived if… (examples) |
+|-------|-----------|--------------------------|
+| **Multidimensional Poverty (MPI)** | education, health, living standards | schooling < 6 yrs; surface water |
+| **Energy Poverty (MEPI)** | access, services | no electricity; wood/charcoal cooking |
+| **Child Wellbeing (MODA-style)** | health, education, WASH | not immunized; stunted; no sanitation |
+
+Each is built with the identical `build_nested_weights` →
+`build_deprivation_matrix` → `alkire_foster` pipeline. See
+[`examples/multi_application_gallery.py`](examples/multi_application_gallery.py)
+for the full, runnable code.
 ## Design notes
 
 A few choices worth surfacing, because they reflect how the measures are meant
