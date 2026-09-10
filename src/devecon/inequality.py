@@ -137,3 +137,69 @@ def atkinson(values, epsilon=1.0, weights=None):
         power = 1.0 - epsilon
         ede = ((w * (x ** power)).sum() / wsum) ** (1.0 / power)
     return float(1.0 - ede / mean)
+
+
+def palma(values, weights=None):
+    """Palma ratio: income share of the top 10% over the bottom 40%.
+
+    A simple, policy-legible inequality measure. Values above 1 mean the
+    richest tenth receive more than the poorest four-tenths combined.
+
+    Parameters
+    ----------
+    values : array-like
+        Non-negative income or consumption per unit.
+    weights : array-like, optional
+        Survey weights; equal by default.
+
+    Returns
+    -------
+    float
+        Palma ratio (>= 0).
+    """
+    x = np.asarray(values, dtype=float)
+    if np.any(x < 0):
+        raise ValueError("values must be non-negative.")
+    w = _prepare_sample_weights(weights, x.shape[0])
+    order = np.argsort(x)
+    x, w = x[order], w[order]
+    cum_pop = np.cumsum(w) / w.sum()
+
+    
+    bottom40 = (w * x)[cum_pop <= 0.40].sum()
+    top10 = (w * x)[cum_pop > 0.90].sum()
+    if bottom40 == 0:
+        raise ValueError("bottom 40% has zero income; Palma is undefined.")
+    return float(top10 / bottom40)
+
+
+def hoover(values, weights=None):
+    """Hoover index (Robin Hood index).
+
+    The share of total income that would need to be redistributed to reach
+    perfect equality. Equals half the sum of absolute deviations of income
+    shares from population shares.
+
+        H = 0.5 * sum_i w_i * | x_i/mean - 1 | / sum_i w_i
+
+    Parameters
+    ----------
+    values : array-like
+        Non-negative income or consumption per unit.
+    weights : array-like, optional
+        Survey weights; equal by default.
+
+    Returns
+    -------
+    float
+        Hoover index in [0, 1).
+    """
+    x = np.asarray(values, dtype=float)
+    if np.any(x < 0):
+        raise ValueError("values must be non-negative.")
+    w = _prepare_sample_weights(weights, x.shape[0])
+    wsum = w.sum()
+    mean = (w * x).sum() / wsum
+    if mean == 0:
+        return 0.0
+    return float(0.5 * (w * np.abs(x / mean - 1.0)).sum() / wsum)
