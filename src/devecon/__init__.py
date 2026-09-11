@@ -8,6 +8,7 @@ from .decompose import (
     theil_by_group,
 )
 from .deprivation import deprive, deprive_in
+from .dominance import DominanceResult, first_order_dominance, second_order_dominance
 from .inequality import atkinson, generalized_entropy, gini, hoover, palma
 from .mpi_detail import AFDecomposition, af_decompose
 from .poverty import AFResult, alkire_foster, fgt, sen, watts
@@ -21,6 +22,7 @@ __all__ = [
     "AFResult",
     "ConcentrationCurve",
     "CutoffProfile",
+    "DominanceResult",
     "FGTDecomposition",
     "LorenzCurve",
     "TheilDecomposition",
@@ -37,6 +39,7 @@ __all__ = [
     "deprive_in",
     "fgt",
     "fgt_by_group",
+    "first_order_dominance",
     "generalized_entropy",
     "generalized_lorenz",
     "gini",
@@ -47,6 +50,7 @@ __all__ = [
     "mean_growth_rate",
     "palma",
     "rank_robustness",
+    "second_order_dominance",
     "sen",
     "theil_by_group",
     "watts",
