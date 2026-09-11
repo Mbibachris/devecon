@@ -1,4 +1,5 @@
 from .build import build_deprivation_matrix, build_nested_weights
+from .concentration import ConcentrationCurve, concentration_curve, concentration_index
 from .curves import GIC, LorenzCurve, generalized_lorenz, growth_incidence, lorenz
 from .decompose import (
     FGTDecomposition,
@@ -18,6 +19,7 @@ __all__ = [
     "GIC",
     "AFDecomposition",
     "AFResult",
+    "ConcentrationCurve",
     "CutoffProfile",
     "FGTDecomposition",
     "LorenzCurve",
@@ -28,6 +30,8 @@ __all__ = [
     "bottom_share_growth",
     "build_deprivation_matrix",
     "build_nested_weights",
+    "concentration_curve",
+    "concentration_index",
     "cutoff_profile",
     "deprive",
     "deprive_in",
