@@ -63,3 +63,15 @@ def test_output_feeds_alkire_foster():
     # scores: 1.0, 0.5, 0, 0 ; poor if >= 0.5 -> first two
     assert res.H == 0.5
     assert res.M0 == pytest.approx(0.375)
+
+
+def test_deprive_in_pandas_na_is_nan():
+    # Regression: pandas nullable columns use pd.NA, not NaN. It used to be
+    # silently flagged 0 (not deprived), understating poverty.
+    pd = pytest.importorskip("pandas")
+    values = pd.array(["surface_water", pd.NA, "piped_dwelling"], dtype="string")
+    out = deprive_in(values, {"surface_water"})
+    assert out[0] == 1.0
+    assert np.isnan(out[1])
+    assert out[2] == 0.0
+  

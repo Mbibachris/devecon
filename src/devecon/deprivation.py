@@ -20,6 +20,21 @@ _OPS = {
 }
 
 
+def _is_missing(value):
+    """True for None, NaN, pandas.NA and NaT -- without importing pandas.
+
+    NaN is the only value not equal to itself. pandas.NA refuses to be
+    turned into True/False (bool(pd.NA) raises TypeError), which is itself
+    the signal that the value is missing.
+    """
+    if value is None:
+        return True
+    try:
+        return bool(value != value)
+    except TypeError:
+        return True
+
+
 def deprive(values, op, cutoff):
     """Flag deprivation by a threshold on a scale.
 
@@ -63,7 +78,7 @@ def deprive_in(values, categories):
     Parameters
     ----------
     values : array-like
-        Categorical achievements. None / NaN yield NaN.
+        Categorical achievements. None / NaN / pandas.NA yield NaN.
     categories : iterable
         The values that count as deprived.
 
@@ -76,7 +91,7 @@ def deprive_in(values, categories):
     deprived = set(categories)
     out = np.empty(len(values), dtype=float)
     for i, v in enumerate(values):
-        if v is None or (isinstance(v, float) and np.isnan(v)):
+        if _is_missing(v):
             out[i] = np.nan
         else:
             out[i] = 1.0 if v in deprived else 0.0

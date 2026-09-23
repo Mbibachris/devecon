@@ -14,8 +14,7 @@ from .mpi_detail import AFDecomposition, af_decompose
 from .poverty import AFResult, alkire_foster, fgt, sen, watts
 from .pro_poor import bottom_share_growth, is_pro_poor, mean_growth_rate
 from .robustness import CutoffProfile, cutoff_profile, rank_robustness
-from .summarize import describe, summary
-
+from .summarize import summary, describe
 __version__ = "0.0.1"
 __all__ = [
     "GIC",
@@ -38,7 +37,6 @@ __all__ = [
     "cutoff_profile",
     "deprive",
     "deprive_in",
-    "describe",
     "fgt",
     "fgt_by_group",
     "first_order_dominance",
@@ -54,7 +52,7 @@ __all__ = [
     "rank_robustness",
     "second_order_dominance",
     "sen",
-    "summary",
     "theil_by_group",
-    "watts",
+    "watts",  
+    "summary", "describe",
 ]
