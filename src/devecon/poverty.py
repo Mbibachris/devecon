@@ -30,8 +30,36 @@ def fgt(income, poverty_line, alpha=0.0, weights=None):
     return float(contributions.sum() / weights.sum())
 
 AFResult = namedtuple("AFResult", ["H", "A", "M0"])
+AFIdentification = namedtuple("AFIdentification", ["scores", "poor", "censored_scores"])
 
-def alkire_foster(deprivations, cutoff_k, indicator_weights=None, sample_weights=None):
+
+def af_identify(deprivations, cutoff_k, indicator_weights=None):
+    """Identify *who* is multidimensionally poor (Alkire-Foster, unit level).
+
+    alkire_foster reports how much poverty there is (H, A, M0). Targeting
+    needs to know which units are poor. This returns, for every unit, its
+    weighted deprivation score, whether it is poor, and its censored score.
+    alkire_foster is built on this function, so the two always agree.
+
+    Parameters
+    ----------
+    deprivations : array-like, shape (n, d)
+        0/1 deprivation matrix (units x indicators).
+    cutoff_k : float
+        Poverty cutoff in (0, 1]: a unit is poor if its score >= k.
+    indicator_weights : array-like, shape (d,), optional
+        Indicator weights; equal by default, rescaled to sum to 1.
+
+    Returns
+    -------
+    AFIdentification
+        scores : numpy.ndarray, shape (n,)
+            Weighted deprivation score c_i in [0, 1].
+        poor : numpy.ndarray of bool, shape (n,)
+            True where c_i >= k.
+        censored_scores : numpy.ndarray, shape (n,)
+            c_i for the poor, 0 for the non-poor.
+    """
     dep = np.asarray(deprivations, dtype=float)
     if dep.ndim != 2:
         raise ValueError("deprivations must be 2-D (people x indicators).")
@@ -49,16 +77,20 @@ def alkire_foster(deprivations, cutoff_k, indicator_weights=None, sample_weights
         if np.any(w < 0):
             raise ValueError("indicator_weights must be non-negative.")
     w = w / w.sum()
-    s = _prepare_sample_weights(sample_weights, n)
     scores = dep @ w
     poor = scores >= cutoff_k
     censored = np.where(poor, scores, 0.0)
+    return AFIdentification(scores=scores, poor=poor, censored_scores=censored)
+
+
+def alkire_foster(deprivations, cutoff_k, indicator_weights=None, sample_weights=None):
+    ident = af_identify(deprivations, cutoff_k, indicator_weights)
+    s = _prepare_sample_weights(sample_weights, ident.scores.shape[0])
     total = s.sum()
-    H = s[poor].sum() / total
-    M0 = (s * censored).sum() / total
+    H = s[ident.poor].sum() / total
+    M0 = (s * ident.censored_scores).sum() / total
     A = M0 / H if H > 0 else 0.0
     return AFResult(H=float(H), A=float(A), M0=float(M0))
-
 
 def watts(income, poverty_line, weights=None):
     """Watts poverty index.
